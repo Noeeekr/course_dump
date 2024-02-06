@@ -1,0 +1,22 @@
+{
+    "myFamily": {
+        "dad": true,
+        "mom": true,
+        "sister": true,
+        "myself": true
+    },
+    "otherFamily": {
+        "dad": true,
+        "mom": true,
+        "sister": true,
+        "sister2": true,
+        "uncle": true
+    },
+    "anotherFamily": {
+        "dad": true,
+        "mom": true,
+        "sister": true,
+        "grandpa": true,
+        "grandma": true
+    }
+}
