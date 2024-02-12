@@ -1,4 +1,4 @@
-function createXMLHttpsRequest(method, url, cb, data = null) {
+function createXMLHttpsRequest(method, url, sucess, data = null) {
     // xml https request;
     const xhr = new XMLHttpRequest();
 
@@ -20,17 +20,13 @@ function createXMLHttpsRequest(method, url, cb, data = null) {
     function verifyAjax() {
         if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 304)) {
             let json = JSON.parse(xhr.responseText)
-            console.log(json)
+            
+            if (typeof sucess === "function") sucess(json);
 
             return;
         }
         if (xhr.status !== 200 && xhr.status !== 304){
-            if (typeof cb === "function") {
-                cb({
-                    status: xhr.status,
-                    message: "something went wrong with connection"
-                })
-            }
+            console.log("error in verify ajax",xhr.status)
             return;
         }
     }
