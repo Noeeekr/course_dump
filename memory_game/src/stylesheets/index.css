@@ -1,0 +1,181 @@
+@charset "UTF-8";
+
+html {
+    background-color: rgb(10,0,20);
+}
+body {
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+}
+
+
+.menu {
+    position: absolute;
+
+    opacity: 0;
+    
+    transform: scale(0.7) translateY(-40px);
+    pointer-events: none;
+
+    transition: opacity 200ms linear, transform 200ms ease-in-out;
+
+    z-index: 2;
+}
+.menu.active {
+    opacity: 1;
+
+    transform: scale(1) translateY(0px);
+
+    pointer-events: all;
+}
+.menu.active .title, .menu.active .startButtons {
+    filter: blur(0px);
+}
+.menu .title {
+    font-family: monospace;
+    font-size: 44px;
+    font-weight: bold;
+    color: white;
+
+    user-select: none;
+
+    filter: blur(10px);
+
+    transition: filter 200ms ease-in-out;
+
+    margin: 10px;
+}
+.menu .startButtons {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+
+    width: 100%;
+
+    filter: blur(10px);
+
+    transition: filter 200ms ease-in-out;
+}
+.menu .startButtons .button {
+    background-color: rgb(220, 20, 60);
+    width: 110px;
+    height: 40px;
+    outline: none;
+    border: none;
+    border-radius: 24px;
+
+    font-family: Verdana;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(255,255,255,0.8);
+
+    transition: background-color 100ms linear, transform 100ms linear;
+
+    cursor: pointer;
+}
+.menu .startButtons .button:hover {
+    background-color: rgb(170, 7, 50);
+
+    transform: scale(1.05);
+}
+
+
+.game {
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 1;
+}
+.game .cards {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 5px;
+
+    width: min(800px,90%);
+        min-width: 450px;
+    height: min(90vh, 75vw);
+
+    margin: 0px auto;
+}
+.cards .cardWrapper {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+}
+.cards .cardWrapper .card {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    perspective: 15000px;
+
+    cursor: pointer;
+}
+.front, .back {
+    transform: translateZ(-3000px);
+
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    border-radius: 1.4vw;
+
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+
+    transition: ease-in-out 600ms;
+}
+.front {
+    background-color: aquamarine;
+
+    z-index: 2;
+}
+.back {
+    background-color: crimson;
+    transform: rotateY(180deg);
+
+    z-index: 1;
+}
+
+.card.active .front {
+    transform: rotateY(180deg)
+}
+.card.active .back {
+    transform: rotateY(0deg);
+}
+
+.card .icon {
+    border-left: solid 15px black;
+    border-right: solid 15px white;
+    border-bottom: solid 25px black;
+    box-shadow: black 0px 0px 1px 1px;
+    border-radius: 10px;
+}
