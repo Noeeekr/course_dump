@@ -1,30 +1,29 @@
 class MemoryGame {
+    
     public _lastCardIndex: number = -1;
+    private _totalMatches: number[] = [];
     private _currentCardIndex: number | null = null;
     private _lastMatch: number = 0;
     private _cardsTemplate: HTMLElement[] = [];
     private _local;
+    
 
     constructor(
         cardQ: number,
         local: HTMLElement
-    ) {
-        if (cardQ % 2)
-            throw Error("cannot initialize with odd card number");
-        
+    ) {        
         if (!local) 
             throw Error("local to apply cards must be specified");
-       
         this._local = local;
 
-        for (let i = 0; i < cardQ / 2; i++) {
-            this.createMatch();
-        }
-
+        this.createAllMatches(cardQ);
         this.suffleCards(this._cardsTemplate);
         local.append(...this._cardsTemplate);
     }
 
+    set totalMatches(value: number) {
+        this._totalMatches[0] = value;
+    }
     set pointerEvents(value: string) {
         this._local.style.setProperty("--menuInteractivity",value);
     } 
@@ -67,7 +66,7 @@ class MemoryGame {
 
     }
 
-    createMatch() {
+    createMatch(): void {
 
         this._lastMatch++;
 
@@ -78,12 +77,41 @@ class MemoryGame {
         }
 
     }
+    
+    createAllMatches(cardQ: number): void {
+
+        if (cardQ % 2)
+            throw Error("cannot initialize with odd card number");
+        this._totalMatches = [0,cardQ / 2];
+
+        for (let i = 0; i < cardQ / 2; i++) {
+            this.createMatch();
+        }
+
+    }
+
+    resetGame(cardQ: number): void {
+        this._lastCardIndex = -1;
+        this._totalMatches = [];
+        this._currentCardIndex = null;
+        this._lastMatch = 0;
+        this._cardsTemplate = [];
+
+        this._local.innerHTML = "";
+
+        this.createAllMatches(cardQ);
+        this.suffleCards(this._cardsTemplate);
+        this._local.append(...this._cardsTemplate);
+    }
 
     get lastMatch(): number {
         return this._lastMatch;
     }
     get currentCardIndex(): number | null {
         return this._currentCardIndex;
+    }
+    get totalMatches(): number[] {
+        return this._totalMatches;
     }
 }
 
@@ -109,10 +137,35 @@ function getParent(el: HTMLElement, name: string): HTMLElement {
     return el;
 
 }
+
+function nextAction(): Promise<number[]> { 
+    
+    return new Promise<number[]>((resolve,reject) => {
+
+    setTimeout(() => {
+
+        Array.from(document.querySelectorAll(".cardWrapper[active]")).forEach((card) => {
+            card.removeAttribute("active");
+        })
+        gameTemplate.pointerEvents = 'all';
+
+        resolve(gameTemplate.totalMatches);
+
+    },1500);
+
+    })
+
+}
+
 function turnCard(el: HTMLElement): void {
-    if (!el) return;
+    if (!el) 
+        return;
 
     el = getParent(el as HTMLElement,'cardStart');
+
+    if (el.getAttribute("found")) 
+        return;
+
     el.setAttribute("active","true");
 
     let elIndex = Array.from(el.parentElement!.children).indexOf(el);
@@ -134,6 +187,7 @@ function turnCard(el: HTMLElement): void {
         Array.from(document.querySelectorAll(`.cardWrapper[match="${gameTemplate.currentCardIndex}"]`)).forEach((card) => {
             card.setAttribute("found","true");
         })
+        gameTemplate.totalMatches[0] = gameTemplate.totalMatches[0] + 1;
 
     }
 
@@ -142,20 +196,21 @@ function turnCard(el: HTMLElement): void {
     }
     
     // game continues normally;
-    
-    setTimeout(() => {
 
-        Array.from(document.querySelectorAll(".cardWrapper[active]")).forEach((card) => {
-            card.removeAttribute("active");
-        })
-        gameTemplate.pointerEvents = 'all';
+    nextAction()
+    .then(([currentMatch,maxMatch]) => {
+        
+        if (currentMatch !== maxMatch) 
+            return;
 
-    },1500);
+        document.querySelector(".menu")?.classList.add("active");
+        document.querySelector(".game")?.classList.remove("active");    
+
+        gameTemplate.resetGame(12);
+        
+    })
+
 }
-
-let gameTemplate = new MemoryGame(12,document.querySelector(".game .cards") as HTMLElement);
-
-
 
 (function() {
     document.querySelector(".menu .button.play")?.addEventListener("click",() => {
@@ -163,3 +218,5 @@ let gameTemplate = new MemoryGame(12,document.querySelector(".game .cards") as H
         document.querySelector(".game")?.classList.add("active");
     })
 })()
+
+let gameTemplate = new MemoryGame(12,document.querySelector(".game .cards") as HTMLElement);

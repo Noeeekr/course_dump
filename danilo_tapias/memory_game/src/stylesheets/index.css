@@ -199,8 +199,8 @@ body {
 }
 
 .cardWrapper[active] .front, .cardWrapper[active] .back {
-    transform: rotateY(180deg)
+    transform: rotateY(180deg);
 }
 .cardWrapper[found] .front, .cardWrapper[found] .back {
-    transform: rotateY(180deg)
+    transform: rotateY(180deg);
 }
