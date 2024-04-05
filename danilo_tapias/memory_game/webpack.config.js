@@ -4,20 +4,33 @@ const path = require('path');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
+const copyWebpackPlugin = require("copy-webpack-plugin");
 
 const stylesHandler = 'style-loader';
 
 
 
 const config = {
-    entry: './src/typescript/game.ts',
+    entry: './src/typescript/main.ts',
     output: {
         path: path.resolve(__dirname, 'dist','js')
     },
     target: ["web","es5"],
     plugins: [
-        // Add your plugins here
-        // Learn more about plugins from https://webpack.js.org/configuration/plugins/
+        new copyWebpackPlugin(
+            {
+                patterns: [
+                    {
+                        from: "src/stylesheets",
+                        to: "../stylesheets"
+                    },
+                    {
+                        from: "index.html",
+                        to: "../pages"
+                    },
+                ],
+            }
+        ),
     ],
     module: {
         rules: [
