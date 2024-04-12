@@ -1,3 +1,10 @@
-const os = require("os");
+const fs = require("fs");
 
-console.log(os.release());
+fs.readdir("./",(err,response) => {
+
+    if (err) {
+        throw new Error(err);
+    }
+
+    console.log(response)
+})

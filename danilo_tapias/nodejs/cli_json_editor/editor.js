@@ -1,57 +1,87 @@
-const readJSONFile = () => {
-    return new Promise((resolve,reject) => {
+// values needed path, keypath of the obj keys (flags),
+
+const path = process.argv[2];
+const lastArg = process.argv[process.argv.length - 1];
+
+if (lastArg.slice(0,2) === "--") 
+    throw new Error("value needed for data insert");
+
+const fs = require("fs");
+
+const newValue = JSON.parse(process.argv.pop());
+const keyPath = [];
+
+for (let arg of process.argv) { 
+
+    if (arg.slice(0,2) === "--") {
+        keyPath.push(arg);
+    }
+
+}
+
+function readJSONFile() {
+    return new Promise((resolve) => {
 
         fs.readFile(path,"UTF-8",(err,content) => {
     
             if (err)
                 throw new Error(err);
 
-            if (check[0] === "check") {
-                reject(content);
-                return;
+            if (!process.argv[3]) {
+                console.log(JSON.parse(content));
+            } else {
+                resolve(JSON.parse(content));
             }
-
-            resolve(content);
 
         })
 
     })
 }
 
-if (!process.argv[2])
-    throw new Error("file local necessary");
+function editObject(obj,keyPath,newValue = null) {
 
-const path = process.argv[2];
-const check = process.argv.splice(3,1);
-const params = process.argv.splice(3);
+    if (!newValue)
+        throw new Error("A value to insert in object must be specified");
 
-if (params.length % 2) {
+    let lastValue = newValue;
 
-    throw new Error("all flags must have one parameter");
+    for (let i = keyPath.length; i > -1; i--) {
+        
+        let value = getObjectValues(obj,keyPath.slice(0,i));
 
-}
+        if (i === keyPath.length)
+            value = newValue;
 
-const fs = require("fs");
+        if (keyPath[i])
+            value[keyPath[i].slice(2)] = lastValue;
 
-readJSONFile()
-.then(content => JSON.parse(content))
-.then(content => {
+        if (value)
+            lastValue = value;
 
-    for (let i = 0; i < params.length / 2; i += 2) {
-        let key = [...params[i]].splice(2).join("");
-    
-        content[key] = params[i + 1];
     }
 
-    return content;
-})
-.then(content => fs.writeFile(path,JSON.stringify(content),(err) => {
+    return lastValue;
+}
 
-    if (err) 
+function getObjectValues(obj,keyPath) {
+
+    for (let i = 0; i < keyPath.length; i++) {
+
+        obj = obj[keyPath[i].slice(2)];
+
+    }
+
+    return obj;
+}
+
+readJSONFile()
+.then(fileContent => editObject(fileContent,keyPath,newValue))
+.then(processedFileContent => fs.writeFile(path,JSON.stringify(processedFileContent),(err) => {
+
+    if (err)
         throw new Error(err);
 
     console.log("file written sucessfully")
-    console.log(content);
+    console.log(processedFileContent);
     
 }))
-.catch(content => console.log(JSON.parse(content)));

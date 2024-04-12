@@ -1,1 +1,10 @@
-{"idk":"Now I know","name":"And","error":"erros solved bitch"}
+{
+    "idk": "finally got the edition",
+    "name": "And",
+    "error": "errors solved bitch",
+    "anotherObj": {
+        "password": {
+            "randomContent": "333"
+        }
+    }
+}
