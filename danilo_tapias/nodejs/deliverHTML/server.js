@@ -2,51 +2,57 @@ const fs = require("fs");
 const path = require("path");
 const http = require("http");
 
-const docPath = "/home/noeeekr/repositories/front_end/udemy/danilo_tapias/nodejs/deliverHTML";
+const mimeType = {
+    "html": "text/html",
+    "png": "image/png",
+    "css": "text/css",
+    "js": "application/javascript"
+}
 
-http.createServer((req,res) => {
-    res.writeHead(200,{ "Content-Type": "text/html" });
-    
-    switch(req.url) {
-        case "/":
-            let readStream = fs.createReadStream(docPath + "/index.html","UTF-8");
-            
-            let html = "";
+const serverStaticFiles = (url,res) => {
 
-            readStream.on("data",data => {
-            
-                html += data;
+    const _path = path.join(__dirname, "static", url);
+    const extName = path.extname(url).substring(1);
 
-            });
+    getStaticFiles(_path,mimeType[extName],res);
+}
+const getStaticFiles = (_path,fileType,res) => {
 
-            readStream.on("end",() => {
+    if (!fs.existsSync(_path)) {
+        res.writeHead(404);
+        console.log("path does not exist ",_path);
 
-                if (html) {
-                    res.end(html)
-                } else {
-                    res.end("<h1>content not found</h1>")
-                }
-        
-            });
-            break;
-        case "/secret":
-            let rStream = fs.createReadStream(docPath + "/secret.html","UTF-8");
+        if (fileType === "text/html") {
+            _path = path.join(__dirname, "static", "404.html");
+        } else {
+            return res.end()
+        }
 
-            let content = "";
-
-            rStream.on("data",(data) => {
-
-                content += data;
-
-            })
-
-            rStream.on("end",() => {
-
-                res.end(content);
-
-            })
-            break;
+    } else {
+        res.writeHead(200, { "Content-Type": fileType });
     }
+
+    fs.createReadStream(_path).pipe(res).on("error", () => {
+        res.writeHead(500);
+        res.end();
+    }).on("finish", () => {
+        console.log("finished delivering requested static file");
+    })
+}
+http.createServer((req,res) => {
+
+    let url = req.url;
+
+    switch(url) {
+        case "/":
+            url = "index.html";
+            break;
+        case "/favicon.ico":
+            res.end()
+            return;
+    }
+
+    serverStaticFiles(url,res);
 
 }).listen(3000);
 
