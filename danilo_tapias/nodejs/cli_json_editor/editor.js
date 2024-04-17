@@ -1,5 +1,8 @@
 // values needed path, keypath of the obj keys (flags),
 
+// I KNOW I CAN DO THIS WITH REFERENCE, BUT THE INTENT IS NOT USING REFERENCE 
+// AAAAAAAAA I COULD DO THIS WITH TEN LINES
+
 const path = process.argv[2];
 const lastArg = process.argv[process.argv.length - 1];
 
