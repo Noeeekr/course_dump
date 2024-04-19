@@ -1,4 +1,5 @@
 const titles = ["my","name","and","core","javascript","random","ignore","lorem"];
+
 const fs = require("fs");
 const path = require("path");
 
